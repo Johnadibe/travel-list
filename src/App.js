@@ -1,4 +1,8 @@
 import React, { useState } from "react";
+import Logo from "./components/Logo";
+import Form from "./components/Form";
+import ParkingList from "./components/ParkingList";
+import Stats from "./components/Stats";
 
 export default function App() {
   // State for the travel list items that would be storing whenever we add a new item
@@ -22,6 +26,12 @@ export default function App() {
     );
   }
 
+  function handleClearList() {
+    if (items.length === 0) return;
+    window.confirm("Are you sure you want to delete all items?");
+    setItems([]);
+  }
+
   return (
     <>
       <Logo />
@@ -30,93 +40,9 @@ export default function App() {
         items={items}
         onDeleteItem={handleDeleteItem}
         onToggleItem={handleToggleItem}
+        onClearList={handleClearList}
       />
-      <Stats />
+      <Stats items={items} />
     </>
-  );
-}
-
-function Logo() {
-  return <h1>🌳 Far Away 👜</h1>;
-}
-function Form({ onAddItems }) {
-  const [description, setDescription] = useState("");
-  const [quantity, setQuantity] = useState(1);
-
-  function handleSubmit(e) {
-    e.preventDefault();
-
-    // Guard clause
-    if (!description) return;
-
-    const newItem = { description, quantity, packed: false, id: Date.now() };
-
-    console.log(newItem);
-    onAddItems(newItem);
-
-    // Use setter to update the input to empty string when you submit the form
-    setDescription("");
-    setQuantity(1);
-  }
-
-  return (
-    <form className="add-form" onSubmit={handleSubmit}>
-      <h3>What do you need for your 😎 trip?</h3>
-      <select
-        value={quantity}
-        onChange={(e) => setQuantity(Number(e.target.value))}
-      >
-        {Array.from({ length: 20 }, (_, i) => i + 1).map((num) => (
-          <option value={num} key={num}>
-            {num}
-          </option>
-        ))}
-      </select>
-      <input
-        type="text"
-        placeholder="item..."
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
-      <button>Add</button>
-    </form>
-  );
-}
-function ParkingList({ items, onDeleteItem, onToggleItem }) {
-  return (
-    <div className="list">
-      <ul>
-        {items.map((item) => (
-          <Item
-            item={item}
-            key={item.id}
-            onDeleteItem={onDeleteItem}
-            onToggleItem={onToggleItem}
-          />
-        ))}
-      </ul>
-    </div>
-  );
-}
-function Item({ item, onDeleteItem, onToggleItem }) {
-  return (
-    <li>
-      <input
-        type="checkbox"
-        value={item.packed}
-        onChange={() => onToggleItem(item.id)}
-      />
-      <span style={item.packed ? { textDecoration: "line-through" } : {}}>
-        {item.quantity} {item.description}
-      </span>
-      <button onClick={() => onDeleteItem(item.id)}>❌</button>
-    </li>
-  );
-}
-function Stats() {
-  return (
-    <footer className="stats">
-      <em>👜 You have X items on your list, and you already packed X (X%)</em>
-    </footer>
   );
 }
